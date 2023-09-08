@@ -1,8 +1,11 @@
 # Overview
 
-This document is for describing the data flow of SmoothTV
+This document is for describing a possible solution for creating and storing match events in a tournament, that can then be viewed on a website by users.
+Here is a very rough and simple example of how a Match object could look like and the events that it could hold: [Types file](./types.ts)
 
 ## Step 1. Sending events from the Scoreboard app
+
+This is the type of events that the Scoreboard app could send to the backend service for storage. It should be sent as soon as possible.
 
 ### Match Start event
 ```js
@@ -28,7 +31,9 @@ const pointEvent: PointEvent = {
 
 ## Step 2. Backend writing event to Firestore or Firebase
 
-Both options here are valid, it comes to down to cost and we want to be able to do with the data while it is "live".
+Both database options here are valid here, it comes to down to cost and we want to be able to do with the data while it is "live".
+We are clearly limited by choosing Firebase when it comes to filtering/querying the data both within and across multiple matches.
+
 Let´s do some calculations, lets say we have 10 MatchEvents and 10 PointEvents per match, that would result in about 0,5kb / match in a Firebase database and 20 writes in a Firestore database.
 Lets say we 1 tournament is 500 matches.
 
@@ -38,7 +43,7 @@ If 50 tournaments in a weekend = 12 Mb / weekend
 
 The free tier in Firebase is 1GB free storage, and 10GB download per month.
 After that its $5/GB storage, and $1 per downloaded GB.
-So we could basically run the entire platform on the free tier.
+So we could basically run the entire platform on the free tier, even if we calcualte for 200 matches / month.
 
 
 ### Firestore
