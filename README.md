@@ -2,6 +2,35 @@
 
 This document is for describing the data flow of SmoothTV
 
+## Step 1. Sending events from the Scoreboard app
+
+### Match Start event
+```js
+const matchStartEvent: MatchEvent = {
+  timestamp: new Date(),
+  matchId: 1,
+  inGameTime: 0,
+  type: MatchEventType.MATCH_START,
+};
+```
+
+### Point event
+```js
+const pointEvent: PointEvent = {
+  timestamp: new Date(),
+  matchId: 1,
+  playerId: 1,
+  inGameTime: 10,
+  type: PointEventType.POINT,
+  value: 3,
+};
+```
+
+## Step 2. Backend writing event to Firestore
+
+
+## Step X. Creating match
+
 ```js
 const player1: Player = {
   id: 1,
