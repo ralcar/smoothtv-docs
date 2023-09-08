@@ -84,25 +84,31 @@ Every match that is finished, does not need to exist in Firebase/Firestore anymo
 Moving data to BigQuery would drastically change the costs, and basically remove most of the Firebase/Firestore costs if we are good at transfering the data.
 BigQuery costs can be found here: https://cloud.google.com/bigquery/pricing
 
-## Step X. Creating match
+## Step 4. Cleanup
 
-```js
-const player1: Player = {
-  id: 1,
-  name: "Ralf Carneborn",
-};
+When a tournament is over, we should have a integrity check, validate that all data has been moved to BigQuery.
+After that it, if everything looks ok, it should be ok to remove the tournament from Firebase/Firestore in order to keep costs down.
 
-const player2: Player = {
-  id: 2,
-  name: "Craig Jones",
-};
+# Highlight creation (Cloud functions)
 
-export const testMatch: Match = {
-  matchId: 1,
-  startDate: new Date(),
-  players: [player1, player2],
-  events: [],
-};
+Every time a record is written to Firebase/Firestore, we can evaluate the event and figure out if this should be a highlight.
+
+Types of highlights that we can create for example, until we have solved how we will classify each event (converting it from a takedown => "double leg takedown")
 ```
+SUBMISSION = match ended with submission
+UNEXPECTED_SUBMISSION = match ended with a submission for the competitor that was clearly loosing
+EARLY_SUBMISSION = quick submission
+COMBO = multiple points within a short time period
+DISQUALIFIQUATION = always fun to watch
+```
+If any of these events are detected, we could
+- fetch video manifest
+- figure out a start and stop time
+- generate a highlight manifest
+- store manifest on s3 for example, or base64 it into the database
+- publish highlight to Firebase/Firestore, so that it can trigger the UI and notifications
 
+## Extra credit = build caching layer on top of BigQuery
 
+BigQuery is good at caching similar requests within a period of time, but as soon as you have some variable in the query or other factors, it will generate a query which results in a cost.
+If we ever feel that we are doing unnecessarly many similar queries to BigQuery that should be the same, we can always create a caching layer on top that we can apply our own logic to.
